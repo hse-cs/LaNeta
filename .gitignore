@@ -6,3 +6,12 @@ saved*
 **.jpeg
 **.ipynb
 .ipynb*
+**.vcf
+*.c
+*.so
+
+
+
+build/
+data/
+saved_data/

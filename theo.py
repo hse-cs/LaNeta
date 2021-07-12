@@ -1,8 +1,7 @@
 import numpy as np
-from algorithm import P
 
 
-def formula_4_emp(params):
+def formula_4_emp(T, M, N, P):
     thLD = np.empty((P,P))
 
     for i in range(P):
@@ -11,43 +10,47 @@ def formula_4_emp(params):
             d = i/P
             ds = j/P
 
-            thLD[i][j] = -params.M1 * (1 - params.M1) * (1 - 2*params.M1) \
-                       * (1 - 1/(2*params.N))**params.T \
-                       * (1 - 2/(2*params.N))**params.T \
-                       * np.exp(-params.T*(d+ds))
+            thLD[i][j] = -M[0] * (1 - M[0]) * (1 - 2*M[0]) \
+                       * (1 - 1/(2*N))**T[0] \
+                       * (1 - 2/(2*N))**T[0] \
+                       * np.exp(-T[0]*(d+ds))
     return thLD
 
 
 
-def formula_6(d, ds, params):
-    return -(1-params.M1) * (1-params.M2) * np.exp(-params.T2*(d+ds)) \
-    * (  params.M2*(1-params.M1)**2 \
-         - (2*params.M2**2)*(1-params.M1)**2 \
-         + params.M1*(1-2*params.M1)*np.exp(-params.T1*(d+ds)) \
-         - params.M1*params.M2*(1-params.M1) \
-         * ( np.exp(-params.T1*d) \
-             + np.exp(-params.T1*ds) \
+def formula_6(d, ds, T, M, N, P):
+    return -(1-M[0]) * (1-M[1]) * np.exp(-T[1]*(d+ds)) \
+    * (  M[1]*(1-M[0])**2 \
+         - (2*M[1]**2)*(1-M[0])**2 \
+         + M[0]*(1-2*M[0])*np.exp(-T[0]*(d+ds)) \
+         - M[0]*M[1]*(1-M[0]) \
+         * ( np.exp(-T[0]*d) \
+             + np.exp(-T[0]*ds) \
              + (1 - np.exp(-d) - np.exp(-ds) \
-             + 2*np.exp(-d-ds))**params.T1 )  )
+             + 2*np.exp(-d-ds))**T[0] )  )
 
-def thld_6(params):
+rho = 1.6e-9#recombination rate per bp per generation
+length=int(1/rho) #1 Morgan chromosome length
+
+def thld_6(T, M, N, P):
     thLD = np.empty((P,P))
     for i in range(P):
         for j in range(P):
-            d = i/P
-            ds = j/P
-            thLD[i,j] = formula_6(d, ds, params)
+            l = 1 #1.35 ms  #0.4 rl
+            d = i/(l*P) #* length# /(l*P)
+            ds = j/(l*P) #* length#/(l*P)
+            thLD[i,j] = formula_6(d, ds, T, M, N, P)
     return thLD
 
 
 
-def formula_4(d,ds, params, drift=False):
-    m1 = params.M1
-    m2 = params.M2
-    N = params.N
-    T1 = params.T1
-    T2 = params.T2
-    T = params.T
+def formula_4(d,ds, T, M, N, P, drift=False):
+    m1 = M[0]
+    m2 = M[1]
+    N = N
+    T1 = T[0]
+    T2 = T[1]
+    T = T1+T2
 
     D1 = np.diag((1-m1,(1-m1)**2,(1-m1)**2,(1-m1)**2,(1-m1)**3))
     D2 = np.diag((1-m2,(1-m2)**2,(1-m2)**2,(1-m2)**2,(1-m2)**3))
@@ -76,11 +79,11 @@ def formula_4(d,ds, params, drift=False):
 
     return np.matmul(np.array([1,-1,-1,-1,2]), v)
 
-def thld_4(params, drift=False):
+def thld_4(T, M, N, P, drift=False):
     idk = np.empty((P,P))
     for i in range(P):
         for j in range(P-i):
-            idk[i][j] = formula_4(i/P, j/P, params, drift)
+            idk[i][j] = formula_4(i/P, j/P, T, M, N, drift)
         if i%30 == 0:
             print('#', end='')
     return idk
