@@ -73,6 +73,6 @@ In utilites folder placed files required for data preparation. You need your vcf
 4. 
 ```
   comm -12 pop1.gen.pos.txt pop2.gen.pos.txt | awk '{print("%s\n", $2)}' > common_snps
-  vcftools --vcf ../pop1.pop1.vcf --keep common_snps --recode --recode-INFO-all | bcftools view -Oz -o filtered.pop1.vcf
-  vcftools --vcf ../pop2.pop2.vcf --keep common_snps --recode --recode-INFO-all | bcftools view -Oz -o filtered.pop2.vcf
+  vcftools --vcf ../pop1.pop1.vcf --snps common_snps --recode --recode-INFO-all | bcftools view -Oz -o filtered.pop1.vcf
+  vcftools --vcf ../pop2.pop2.vcf --snps common_snps --recode --recode-INFO-all | bcftools view -Oz -o filtered.pop2.vcf
  ```
