@@ -70,6 +70,9 @@ In utilites folder placed files required for data preparation. You need your vcf
 1. Execute *get_interpolation_files.sh* to get recombination maps for future interpolation. It will be in folder map. 
 2. To execute *preparation.sh* you will have to enter the name of your file without .vcf. At the end you will have .txt file with 4 columns: `CHROM` `ID` `POS` `GEN_POS`. The forth column refers to morgan units.
 3. Repeat with all populations you have
-4. Use *get_common.sh* to leave common snps in both .txt file and .vcf file.
-
-
+4. 
+```
+  comm -12 pop1.gen.pos.txt pop2.gen.pos.txt | awk '{print("%s\n", $2)}' > common_snps
+  vcftools --vcf ../pop1.pop1.vcf --keep common_snps --recode --recode-INFO-all | bcftools view -Oz -o filtered.pop1.vcf
+  vcftools --vcf ../pop2.pop2.vcf --keep common_snps --recode --recode-INFO-all | bcftools view -Oz -o filtered.pop2.vcf
+ ```
