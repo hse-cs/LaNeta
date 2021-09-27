@@ -1,0 +1,5 @@
+mkdir -p map
+cd map
+wget https://github.com/joepickrell/1000-genomes-genetic-maps/blob/master/interpolated_from_hapmap/chr{1..22}.interpolated_genetic_map.gz
+gunzip chr{1..22}.interpolated_genetic_map.gz
+cd ..
