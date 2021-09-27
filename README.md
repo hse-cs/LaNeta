@@ -60,4 +60,16 @@ If you specify only one source population, admixed population is separated into 
 
 `-cm` parameter specifies max genetic distance for estimations (in cantimorgans).
 
-`-m1`, `-m2`, `-mt` parameters can be used for setting adm. proportions for times estimation. You can specify m1 and m2 or the total ancestry proportion mt.    
+`-m1`, `-m2`, `-mt` parameters can be used for setting adm. proportions for times estimation. You can specify m1 and m2 or the total ancestry proportion mt. 
+
+
+### Data preparaion fro analysis
+
+In utilites folder placed files required for data preparation. You need your vcf.gz file and its index file, also check if `bcftools`, `vcftools` and `plink` are installed.
+
+1. Execute get_interpolation_files to get recombination maps for future interpolation. It will be in folder map. 
+2. To execute preparation.sh you will have to enter the name of your file without .vcf. At the end you will have .txt file with 4 columns: `CHROM` `ID` `POS` `GEN_POS`. The forth column refers to morgan units.
+3. Repeat with all populations you have
+4. Use get_common.sh to leave common snps in both .txt file and .vcf file.
+
+
