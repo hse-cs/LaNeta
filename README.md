@@ -60,4 +60,4 @@ If you specify only one source population, admixed population is separated into 
 
 `-cm` parameter specifies max genetic distance for estimations (in cantimorgans).
 
-`-m1`, `-m2`, `-mt` parameters can be used for setting adm. proportions for times estimation. You can specify m1 and m2 or the total admixture proportion mt.   
+`-m1`, `-m2`, `-mt` parameters can be used for setting adm. proportions for times estimation. You can specify m1 and m2 or the total ancestry proportion mt.    
