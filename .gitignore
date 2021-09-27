@@ -9,9 +9,10 @@ saved*
 **.vcf
 *.c
 *.so
+*.npy
 
-
-
+conv*
+*/
 build/
 data/
 saved_data/

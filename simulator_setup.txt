@@ -1,0 +1,13 @@
+T1 = 10           # time between two adm. events
+T2 = 10           # time of the most recent adm. event
+M1 = 0.2          # adm. prop. of the first adm. event for src2
+M2 = 0.2          # adm. prop. of the most recent adm event for src2
+adm_size = 100    # sample size of admixed population
+src1_size = 100   # sample size of the first source population
+src2_size = 100   # sample size of the second source population
+mu = 1.25e-8      # mutation rate
+rho = 1.6e-9      # recombination rate
+N_dip = 1000      # effective population size
+Tdiv = 4000       # generations
+lenght = 1        # morgans
+chr_n = 2         # number of chromosomes

@@ -44,16 +44,10 @@ def thld_6(T, M, N, P):
 
 
 
-def formula_4(d,ds, T, M, N, P, drift=False):
-    m1 = M[0]
-    m2 = M[1]
+def formula_4(d,ds, D, T, N, drift=False):
     N = N
-    T1 = T[0]
-    T2 = T[1]
-    T = T1+T2
+    T = T[0]+T[1]
 
-    D1 = np.diag((1-m1,(1-m1)**2,(1-m1)**2,(1-m1)**2,(1-m1)**3))
-    D2 = np.diag((1-m2,(1-m2)**2,(1-m2)**2,(1-m2)**2,(1-m2)**3))
     L = np.array(
   [ [ 1,                0,                 0,               0,              0                    ],
     [ 1/(2*N),          (2*N-1)/(2*N),     0,               0,              0                    ],
@@ -68,22 +62,23 @@ def formula_4(d,ds, T, M, N, P, drift=False):
     [ 0,                 0,                             0,                                        0,                         1]])
 
 
-    v = np.array([1-m1,(1-m1)**2,(1-m1)**2,(1-m1)**2,(1-m1)**3])
+    v = np.array([D[-1][0][0],D[-1][1][1]**2,D[-1][2][2]**2,D[-1][3][3]**2,D[-1][4][4]**3])
 
     for i in range(T-1,-1,-1):
         v = np.matmul(U, v)
         if drift:
             v = np.matmul(L, v)
-        if i == T2:
-            v = np.matmul(D2, v)
+        v = np.matmul(D[i], v)
 
     return np.matmul(np.array([1,-1,-1,-1,2]), v)
 
-def thld_4(T, M, N, P, drift=False):
-    idk = np.empty((P,P))
-    for i in range(P):
-        for j in range(P-i):
-            idk[i][j] = formula_4(i/P, j/P, T, M, N, drift)
+def thld_4(D, T, N, P, drift=False):
+    scale = P//5-P//200
+    print(scale)
+    idk = np.zeros((scale,scale))
+    for i in range(scale):
+        for j in range(scale):
+            idk[i][j] = formula_4((i+P//200)/P, (j+P//200)/P, D, T, N, drift)
         if i%30 == 0:
             print('#', end='')
     return idk
