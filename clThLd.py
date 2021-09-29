@@ -17,6 +17,17 @@ def smart_add(a, b):
         b[:a.shape[0], :a.shape[0]] += a
         return b
 
+def mkarr(ls):
+    shape = 0
+    for arr in ls:
+        if arr.shape[0] > shape:
+            shape = arr.shape[0]
+    Arr = np.zeros((len(ls), shape, shape))
+    for i in range(len(ls)):
+        Arr[i, :ls[i].shape[0], :ls[i].shape[0]] = ls[i]
+    return Arr
+
+
 class Chromosome:
     def __init__(self): # data = [H_gen, F_gen, G_gen, seqlens]
         self.H_vcf, self.F_vcf, self.G_vcf = None, None, None
@@ -165,6 +176,10 @@ class Algorithm:
                                    exp.data.G,   exp.data.n2,
                                    exp.data.pos, exp.data.c_x,
                                    exp.d_unit) )
+        # print(b.shape)
+        # #KILL VARIANCE
+        # b[:, self.c > 1000] = 0
+        # b[:, self.c < 30] = 0
         exp.b_int.append(b)
         return b
 
@@ -256,7 +271,9 @@ class Algorithm:
 
     def estimate_denumerator(self):
         exp = self.exp
-        c = self.estimate_bin_c()
+        self.c = self.estimate_bin_c()
+        c = self.c
+        print(c.shape)
         self.denumerator = FFT(c[:self.border])[1:self.border, 1:self.border] #zeros in the end of array
         self.denumerator = np.round(self.denumerator) #kill machine epsilon (everewhere int)
         return self.denumerator
@@ -380,6 +397,43 @@ class ThLd:
             alg = Algorithm(self)
             self.at = alg.estimate_affine_term()
 
+    def estimate_time(self, m1=None, m2=None, mt=None, jk=False, du=0.001, cm=30, af=False):
+        if af:
+            self.start_affine()
+        self.start(du=du)
+        if mt!=None:
+            self.Mt = mt
+            T1, T2 = self.estimate_ls_one_prop(cm=cm)
+        else:
+            self.M = [m1,m2]
+            T1, T2 = self.estimate_ls(cm=cm)
+        T1_do = np.zeros((self.chr_n))
+        T2_do = np.zeros((self.chr_n))
+        T1_ps = np.zeros((self.chr_n))
+        T2_ps = np.zeros((self.chr_n))
+        _T1, T1_ = np.nan, np.nan
+        _T2, T2_ = np.nan, np.nan
+        if jk:
+            for chr_i in range(self.chr_n):
+                alg = Algorithm(self)
+                self.numerator = np.delete(self.numerators, chr_i, axis=0).sum(axis=0)
+                self.denumerator = np.delete(self.denumerators, chr_i, axis=0).sum(axis=0)
+                self.numerator /= self.chr_n - 1
+                self.denumerator /= self.chr_n - 1
+                self.coef = alg.get_coef() - self.at
+                self.delta = np.delete(self.deltas, chr_i, axis=0).sum()
+                self.delta /= self.chr_n - 1
+                if mt!=None:
+                    T1_do[chr_i], T2_do[chr_i] = self.estimate_ls_one_prop(cm=cm)
+                else:
+                    T1_do[chr_i], T2_do[chr_i] = self.estimate_ls(cm=cm)
+            T1_ps = self.chr_n * T1 - (self.chr_n-1) * T1_do
+            T2_ps = self.chr_n * T2 - (self.chr_n-1) * T2_do
+            _T1 = T1_ps.mean() - 1.96*np.sqrt((1/self.chr_n)*T1_ps.var())
+            T1_ = T1_ps.mean() + 1.96*np.sqrt((1/self.chr_n)*T1_ps.var())
+            _T2 = T2_ps.mean() - 1.96*np.sqrt((1/self.chr_n)*T2_ps.var())
+            T2_ = T2_ps.mean() + 1.96*np.sqrt((1/self.chr_n)*T2_ps.var())
+        return T1, T2, [_T1, T1_] , [_T2, T2_]
     def start(self, du=0.001):
 
         self.numerator = np.empty(0)
@@ -406,8 +460,13 @@ class ThLd:
             raw = self.data_ms
 
         print(chr_n, one_ref)
-
+        self.chr_n = chr_n
         g_num = 0 #chr loop
+
+        self.numerators = []
+        self.denumerators = []
+        self.deltas = []
+
         for i in range(chr_n):
             delta_i = 0
             self.data.read(raw, i)
@@ -428,6 +487,13 @@ class ThLd:
             self.denumerator = smart_add(self.denumerator, denumerator_i)
             self.delta += delta_i
 
+            self.numerators.append(numerator_i)
+            self.denumerators.append(denumerator_i)
+            self.deltas.append(delta_i)
+
+        self.numerators = mkarr(self.numerators)
+        self.denumerators = mkarr(self.denumerators)
+        self.deltas = np.array(self.deltas)
         #final estimation
         alg = Algorithm(self)
         self.numerator /= g_num

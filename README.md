@@ -47,7 +47,7 @@ To specify .vcf  and .txt use these parameters:
 ```
 Example for real data:
 ```
-python thld.py -a admixed/population/dir.vcf.gz -s1 first/source/pop/dir.vcf.gz -s2 second/source/pop/dir.vcf.gz -m yri_clm/mapfile.txt -e 0.01 -cm 30 -m2 0.9925 -m1 0.4175 -af
+python thld.py -a admixed/population/dir.vcf.gz -s1 first/source/pop/dir.vcf.gz -s2 second/source/pop/dir.vcf.gz -m mapfile/dir.txt -e 0.01 -cm 30 -m2 0.9925 -m1 0.4175 -af
 ```
 If you specify only one source population, admixed population is separated into two equal-sized groups. These groups are used as the admixed and the missing source population.
 
@@ -58,19 +58,21 @@ If you specify only one source population, admixed population is separated into 
 
 `-af` flag is needed if you want to estimate and subtract affine term that due to population substructure.
 
+`-kf` flag for calculation of confidence intervals using jackknife by leaving out each chromosome
+
 `-cm` parameter specifies max genetic distance for estimations (in cantimorgans).
 
-`-m1`, `-m2`, `-mt` parameters can be used for setting adm. proportions for times estimation. You can specify m1 and m2 or the total ancestry proportion mt. 
+`-m1`, `-m2`, `-mt` parameters can be used for setting adm. proportions for times estimation. You can specify m1 and m2 or the total ancestry proportion mt.
 
 
-### Data preparaion fro analysis
+## Data preparaion fro analysis
 
 In utilites folder placed files required for data preparation. You need your vcf.gz file and its index file, also check if `bcftools`, `vcftools` and `plink` are installed.
 
-1. Execute *get_interpolation_files.sh* to get recombination maps for future interpolation. It will be in folder map. 
+1. Execute *get_interpolation_files.sh* to get recombination maps for future interpolation. It will be in folder map.
 2. To execute *preparation.sh* you will have to enter the name of your file without .vcf. At the end you will have .txt file with 4 columns: `CHROM` `ID` `POS` `GEN_POS`. The forth column refers to morgan units.
 3. Repeat with all populations you have
-4. 
+4.
 ```
   comm -12 pop1.gen.pos.txt pop2.gen.pos.txt | awk '{print("%s\n", $2)}' > common_snps
   vcftools --vcf ../pop1.pop1.vcf --snps common_snps --recode --recode-INFO-all | bcftools view -Oz -o filtered.pop1.vcf

@@ -61,6 +61,9 @@ parser.add_argument('--m2', '-m2', nargs=1, type=float, default=None,
                     help='adm. prop of the first event for the second source pop.')
 parser.add_argument('--mt', '-mt', nargs=1, type=float, default=None,
                     help='total adm. prop. for the second source pop.')
+parser.add_argument('--jk', '-jk',
+                    help="Estimate confidence intervals with jackknife",
+                    action="store_true")
 
 clargs = parser.parse_args()
 if isinstance(clargs.e, list):
@@ -100,17 +103,8 @@ if clargs.msprime:
     exp = ThLd(data_ms=ts_list)
 else:
     exp = ThLd(vcf0=clargs.admixed_vcf, vcf1=clargs.source1_vcf, vcf2=clargs.source2_vcf, mapfile=clargs.mapfile)
-    if clargs.affine_term:
-        exp.start_affine(max_c_af=10000)
 
-exp.start(du = clargs.e)
-
-if clargs.m1!=None and clargs.m2!=None:
-    exp.M = [clargs.m1, clargs.m2]
-    print(exp.M, clargs.cm)
-    x = exp.estimate_ls(cm=clargs.cm)
-elif clargs.Mt != None:
-    exp.Mt = clargs.mt
-    x = exp.estimate_ls_one_prop(cm=clargs.cm)
-
-print(x, exp.M)
+est = exp.estimate_time(m1=clargs.m1, m2=clargs.m2, mt=clargs.mt, jk=clargs.jk, af=clargs.affine_term, cm=clargs.cm, du=clargs.e)
+print('T1, T2:', est[0], est[1], end=' ')
+if est[2][0]!=np.nan:
+    print('T1: ({}, {}), T2: ({}, {})'.format(est[2][0], est[2][1], est[3][1], est[3][0]))
