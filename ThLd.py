@@ -107,4 +107,4 @@ else:
 est = exp.estimate_time(m1=clargs.m1, m2=clargs.m2, mt=clargs.mt, jk=clargs.jk, af=clargs.affine_term, cm=clargs.cm, du=clargs.e)
 print('T1, T2:', est[0], est[1], end=' ')
 if est[2][0]!=np.nan:
-    print('T1: ({}, {}), T2: ({}, {})'.format(est[2][0], est[2][1], est[3][1], est[3][0]))
+    print('T1: ({}, {}), T2: ({}, {})'.format(est[2][0], est[2][1], est[3][0], est[3][1]))
