@@ -58,7 +58,7 @@ If you specify only one source population, admixed population is separated into 
 
 `-af` flag is needed if you want to estimate and subtract affine term that due to population substructure.
 
-`-kf` flag for calculation of confidence intervals using jackknife by leaving out each chromosome
+`-jk` flag for calculation of confidence intervals using jackknife by leaving out each chromosome
 
 `-cm` parameter specifies max genetic distance for estimations (in cantimorgans).
 
