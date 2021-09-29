@@ -65,7 +65,7 @@ If you specify only one source population, admixed population is separated into 
 `-m1`, `-m2`, `-mt` parameters can be used for setting adm. proportions for times estimation. You can specify m1 and m2 or the total ancestry proportion mt.
 
 
-## Data preparaion fro analysis
+## Data preparation for analysis
 
 In utilites folder placed files required for data preparation. You need your vcf.gz file and its index file, also check if `bcftools`, `vcftools` and `plink` are installed.
 
