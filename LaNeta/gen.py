@@ -14,7 +14,10 @@ def twopulse_upd(T=[10,10], M=[0.2, 0.2], sample_sizes=[100, 100, 100], mu=1.25e
     dem.add_population_split(time=Tdiv, derived=["F", "G"], ancestral="old")
     dem.sort_events()
 
-    ts = msprime.sim_ancestry(samples={"H": sample_sizes[0]/2, "F": sample_sizes[1]/2, "G": sample_sizes[2]/2}, demography=dem,
-        sequence_length = length, recombination_rate=rho, model=[msprime.DiscreteTimeWrightFisher(duration=50) ,msprime.StandardCoalescent(duration=3950)], random_seed=seed)
+    ts = msprime.sim_ancestry(
+        samples={"H": sample_sizes[0], "F": sample_sizes[1], "G": sample_sizes[2]},
+        demography=dem, sequence_length = length, recombination_rate=rho, ploidy=2,
+        model=[msprime.DiscreteTimeWrightFisher(duration=50) ,msprime.StandardCoalescent(duration=3950)],
+        random_seed=seed)
     mts = msprime.sim_mutations(ts, rate=mu, random_seed=seed)
     return mts

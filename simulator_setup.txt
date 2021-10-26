@@ -1,4 +1,4 @@
-T1 = 10           # time between two adm. events
+T1 = 20           # time between two adm. events
 T2 = 10           # time of the most recent adm. event
 M1 = 0.2          # adm. prop. of the first adm. event for src2
 M2 = 0.2          # adm. prop. of the most recent adm event for src2
@@ -10,4 +10,4 @@ rho = 1.6e-9      # recombination rate
 N_dip = 1000      # effective population size
 Tdiv = 4000       # generations
 lenght = 1        # morgans
-chr_n = 2         # number of chromosomes
+chr_n = 20        # number of chromosomes

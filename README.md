@@ -2,7 +2,7 @@
 Statistical method for estimating the timing of multiple admixture events based on three locus Linkage Disequilibrium and Local Ancestry.
 
 
-## Installation
+# Installation
 
 For performance reasons, we use cython to speed up calculations, so you need
 to compile `.pyx` by yourself. For this, you need a working toolchain for building C
@@ -18,51 +18,72 @@ $ python -m pip install msprime
 To compile .pyx you should use
 
 ```
-$ python setup.py build_ext -i
+$ python3 setup.py build_ext -i
 ```
 
-## Settings
-### Simulations
+# Settings
+## Simulations
 
 
 You can use the method with simulated data for two pulse model. We use msprime for simulations.
 To simulate genetic data you should use `-ms` flag and `simulator_setup.txt`. Use `-seed` parameter to set random seed.
 Example for simulations:
 ```
-python thld.py -ms -e 0.01 -mt 0.16
+python3 laneta.py -ms -e 0.01 -mt 0.16
 ```
 
-### Real data
+## Real data
 We use .vcf files for admixed and two source populations and .txt file with morgan units:
 
 To specify .vcf  and .txt use these parameters:
-`-a admixed/population/dir.vcf.gz`
-`-s1 first/source/pop/dir.vcf.gz`
-`-s2 second/source/pop/dir.vcf.gz`
+`-vcf vcf/dir.vcf.gz`
 `-m morgans.txt`
+`-pf pop.txt`
 
-.txt format:
+Also you need to specify which populations from `pop.txt` are admixed and source:
+`-p0 ADM`
+`-p1 SRC1`
+`-p2 SRC2`
+
+morgans .txt format:
 ```
   CHR_NUMBER VAR_ID POS_PB POS_MORGANS
 ```
+
+populations .txt format:
+```
+  SAMPLE POPULATION
+```
+
 Example for real data:
 ```
-python thld.py -a admixed/population/dir.vcf.gz -s1 first/source/pop/dir.vcf.gz -s2 second/source/pop/dir.vcf.gz -m mapfile/dir.txt -e 0.01 -cm 30 -m2 0.9925 -m1 0.4175 -af
+python3 laneta.py -e 0.01 -vcf data_yri_clm/mer.vcf.gz -pf data_yri_clm/pop.txt -m data_yri_clm/map.txt -p0 CLM -p1 YRI -mt 0.95
 ```
 If you specify only one source population, admixed population is separated into two equal-sized groups. These groups are used as the admixed and the missing source population.
 
 
-### Another settings
+## All settings
+### flags
+`-af` is needed if you want to estimate and subtract affine term that due to population substructure.
+`-jk` for calculation of confidence intervals using jackknife by leaving out each chromosome
+`-ms` for running on simulations
+### bracket parameters
+`-e` sets the distance between centres of brackets for FFT (default is 0.01).
+`-r` sets the radius of brackets for FFT (default is half of `e`).
+### files
+`vcf` specifies .vcf file that contains data for all populations
+`pf` .txt file that contains samples with indicated population
+`-m` .txt file with chromosome name(1-22), var id, var position(bp), var position(cm)
+`-p0` name of the admixed population in population .txt file
+`-p1` name of the first source population in population .txt file
+`-p2` name of the second source in popultion .txt file
+### proportions
+`-m1`, `-m2`, `-mt` used for setting adm. proportions for times estimation. You can specify m1 and m2 or the total ancestry proportion mt.
+### cm parameters
+`-min` and `-max` specifies min and max genetic distance for estimations (in cantimorgans).
+### other
+`-seed` specifies random seed.
 
-`-e` sets the length of brackets for FFT (default is 0.01).
-
-`-af` flag is needed if you want to estimate and subtract affine term that due to population substructure.
-
-`-jk` flag for calculation of confidence intervals using jackknife by leaving out each chromosome
-
-`-cm` parameter specifies max genetic distance for estimations (in cantimorgans).
-
-`-m1`, `-m2`, `-mt` parameters can be used for setting adm. proportions for times estimation. You can specify m1 and m2 or the total ancestry proportion mt.
 
 
 ## Data preparation for analysis

@@ -12,7 +12,6 @@ saved*
 *.npy
 
 conv*
-*/
 build/
-data/
+data*/
 saved_data/
