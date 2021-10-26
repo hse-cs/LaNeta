@@ -88,7 +88,7 @@ If you specify only one source population, admixed population is separated into 
 
 ## Data preparation for analysis
 
-In utilites folder placed files required for data preparation. You need your vcf.gz file and its index file, also check if `bcftools`, `vcftools` and `plink` are installed.
+Files which are required for data preparation are places in utilites folder. You need your vcf.gz file and its index file, also check if `bcftools`, `vcftools` and `plink` are installed.
 
 1. Execute *get_interpolation_files.sh* to get recombination maps for future interpolation. It will be in folder map.
 2. To execute *preparation.sh* you will have to enter the name of your file without .vcf. At the end you will have .txt file with 4 columns: `CHROM` `ID` `POS` `GEN_POS`. The forth column refers to morgan units.
