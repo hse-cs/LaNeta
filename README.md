@@ -104,7 +104,7 @@ Files which are required for data preparation are places in utilites folder. You
 3. Repeat with all populations you have
 4.
 ```
-  comm -12 pop1.gen.pos.txt pop2.gen.pos.txt | awk '{print("%s\n", $2)}' > common_snps
+  comm -12 pop1.gen.pos.txt pop2.gen.pos.txt | awk '{print($2)}' > common_snps
   vcftools --vcf ../pop1.pop1.vcf --snps common_snps --recode --recode-INFO-all | bcftools view -Oz -o filtered.pop1.vcf
   vcftools --vcf ../pop2.pop2.vcf --snps common_snps --recode --recode-INFO-all | bcftools view -Oz -o filtered.pop2.vcf
  ```
