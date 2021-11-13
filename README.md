@@ -102,4 +102,11 @@ Files which are required for data preparation are places in utilites folder. You
 1. Execute *get_interpolation_files.sh* to get recombination maps for future interpolation. It will be in folder map.
 2. To execute *preparation.sh* you will have to enter the name of your file without .vcf. As a result, you will have .txt file with 4 columns: `CHROM` `ID` `POS` `GEN_POS`. The forth column refers to morgan units.
 3. Repeat with all populations you have
-4. Prepare the file which contains 2 columns: sample ID and Family ID. You should have one file for all populations you have.
+4. Merge all your population file by running
+  ```
+    bcftools merge pop1.vcf pop2.vcf -Oz -o merged.vcf.gz
+    plink --vcf merged.vcf.gz --chr 1-22 --snps-only --recode vcf --out filtered_merged
+    bcftools view -Oz -o filtered_merged.vcf.gz filtered_merged
+  ```
+  filtered_merged.vcf.gz is the file for your further analysis.
+5. Prepare the file which contains 2 columns: sample ID and Family ID. (You should have one file for all populations you have.)
