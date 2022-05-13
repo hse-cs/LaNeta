@@ -7,37 +7,15 @@ from random import randrange
 from random import randint
 import numpy as np
 
-from LaNeta.ThLd import ThLd
-from LaNeta import gen
-
-def read_simulation_setup(file):
-    d = {}
-    f = open(file)
-    for line in f:
-        (key, value) = line.split('=')
-        key = key.split()[0]
-        value = value.split()[0]
-        d[key] = value
-        print(key,'=', value)
-    f.close()
-    d['T']=[int(d['T1']),int(d['T2'])]
-    d['M']=[float(d['M1']), float(d['M2'])]
-    d['sample_sizes']=int(d['adm_size']), int(d['src1_size']), int(d['src2_size'])
-    d['mu']=float(d['mu'])
-    d['rho'] = float(d['rho'])
-    d['N_haploid'] = float(d['N_dip'])
-    d['Tdiv'] = int(d['Tdiv'])
-    d['lenght_m'] = float(d['lenght'])
-    d['chr_n'] = int(d['chr_n'])
-    return d
+from LaNeta.ThLd import LaNeta
 
 
 parser = argparse.ArgumentParser(description='...')
 
 #brackets
-parser.add_argument('--e', '-e', nargs=1, type=float, default=0.001,
+parser.add_argument('--binsize', '-b', nargs=1, type=float, default=0.001,
                     help='distance between brackets (default is 0.001)')
-parser.add_argument('--r', '-r', nargs=1, type=float, default=0.0,
+parser.add_argument('--binradius', '-r', nargs=1, type=float, default=0.0,
                     help='radius for bracket')
 
 #files
@@ -55,8 +33,8 @@ parser.add_argument('--pop2', '-p2', nargs=1, default=None,
                     help='name of the second source in popfile')
 
 #flags
-parser.add_argument("--msprime", '-ms',
-                    help="Use msprime to generate data",
+parser.add_argument("--genotype", '-gt',
+                    help="Use if you use genotype data instead of haplotype",
                     action="store_true")
 parser.add_argument("--affine_term", '-af',
                     help="Estimate affine term that due to population substructure",
@@ -71,29 +49,29 @@ parser.add_argument('--max', '-max', nargs=1, type=int, default=20,
 parser.add_argument('--min', '-min', nargs=1, type=int, default=1,
                     help='min d and ds for estimation in cantimograns')
 
-#proportions
+#parameters
 parser.add_argument('--m1', '-m1', nargs=1, type=float, default=None,
                     help='adm. prop of the first event for the second source pop.')
 parser.add_argument('--m2', '-m2', nargs=1, type=float, default=None,
                     help='adm. prop of the first event for the second source pop.')
+parser.add_argument('--t1', '-t1', nargs=1, type=float, default=None,
+                    help='adm. time of the first event.')
+parser.add_argument('--t2', '-t2', nargs=1, type=float, default=None,
+                    help='adm. time of the first event.')
 parser.add_argument('--mt', '-mt', nargs=1, type=float, default=None,
                     help='total adm. prop. for the second source pop.')
-
-#other
-parser.add_argument('--seed', '-seed', nargs=1, type=int, default=randint(100000, 1000000),
-                    help='random seed')
 
 
 clargs = parser.parse_args()
 
 #brackets
-if isinstance(clargs.e, list):
-    clargs.e = clargs.e[0]
+if isinstance(clargs.binsize, list):
+    clargs.binsize = clargs.binsize[0]
 
-if isinstance(clargs.r, list):
-    clargs.r = clargs.r[0]
-if clargs.r == 0:
-    clargs.r = clargs.e / 2
+if isinstance(clargs.binradius, list):
+    clargs.binradius = clargs.binradius[0]
+if clargs.binradius == 0:
+    clargs.binradius = clargs.binsize / 2
 
 #files
 if isinstance(clargs.vcffile, list):
@@ -114,6 +92,10 @@ if isinstance(clargs.m1, list):
     clargs.m1 = clargs.m1[0]
 if isinstance(clargs.m2, list):
     clargs.m2 = clargs.m2[0]
+if isinstance(clargs.t1, list):
+    clargs.t1 = clargs.t1[0]
+if isinstance(clargs.t2, list):
+    clargs.t2 = clargs.t2[0]
 if isinstance(clargs.mt, list):
     clargs.mt = clargs.mt[0]
 
@@ -123,37 +105,19 @@ if isinstance(clargs.max, list):
 if isinstance(clargs.min, list):
     clargs.min = clargs.min[0]
 
-#other
-if isinstance(clargs.seed, list):
-    clargs.seed = clargs.seed[0]
+print('Starting LaNeta...')
+exp = LaNeta(popfile=clargs.popfile, vcffile=clargs.vcffile,
+             pop0=clargs.pop0, pop1=clargs.pop1, pop2=clargs.pop2,
+             mapfile=clargs.mapfile, gt=clargs.genotype)
+
+parameters = exp.estimateTwoPulse(cm_max=20, freq_filter=0,
+                                  bin_size=0.001, bin_radius=0.0005,
+                                  cm_min=0.5,
+                                  M1=clargs.m1, M2=clargs.m2,
+                                  T1=clargs.t1, T2=clargs.t2,
+                                  Mt=clargs.mt)
 
 
-if clargs.msprime:
-    ts_list = []
-    print('msprime: generating...')
-    d = read_simulation_setup('simulator_setup.txt')
-    seed = clargs.seed
-    chr_n = d['chr_n']
-    print('random seed:', seed,'\n')
-    for chr_i in range(chr_n):
-        ts_list.append(gen.twopulse_upd(T=d['T'], M=d['M'], sample_sizes=d['sample_sizes'],
-                                       mu=d['mu'], rho = d['rho'], N_haploid = d['N_haploid'],
-                                       Tdiv = d['Tdiv'], lenght_m = d['lenght_m'], seed=seed*chr_n+chr_i))
-        print('chrom {}/{} generated'.format(chr_i + 1, chr_n))
-    exp = ThLd(data_ms=ts_list, m=clargs.mt, m1=clargs.m1, m2=clargs.m2)
-else:
-    exp = ThLd(popfile=clargs.popfile, vcffile=clargs.vcffile,
-               pop0=clargs.pop0, pop1=clargs.pop1, pop2=clargs.pop2,
-               mapfile=clargs.mapfile, m=clargs.mt, m1=clargs.m1, m2=clargs.m2)
-
-est = exp.estimate_time(jk=clargs.jk, af=clargs.affine_term, cm_min=clargs.min,
-                        cm_max=clargs.max, du=clargs.e, r=clargs.r, mt=clargs.mt)
-#     exp = ThLd(popfile=clargs.popfile, vcffile=clargs.vcffile,
-#                pop0=clargs.pop0, pop1=clargs.pop1, pop2=clargs.pop2,
-#                mapfile=clargs.mapfile, m=clargs.mt, m1=clargs.m1, m2=clargs.m2)
-#
-# est = exp.estimate_time(jk=clargs.jk, af=clargs.affine_term, cm_min=clargs.min, cm_max=clargs.max,
-#                         du=clargs.e, r=clargs.r, mt=clargs.mt)
-print('T1, T2:', est[0], est[1])
+print('[T1, T2, M1, M2] =', parameters)
 if clargs.jk:
     print('T1: ({}, {})\nT2: ({}, {})'.format(est[2][0], est[2][1], est[3][0], est[3][1]))

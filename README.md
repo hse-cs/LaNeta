@@ -64,27 +64,29 @@ If you specify only one source population, admixed population is separated into 
 
 ## All settings
 ### flags
+`-gt` if you use genotype data instead of haplotype.
+
 `-af` is needed if you want to estimate and subtract affine term that due to population substructure.
 
-`-jk` for calculation of confidence intervals using jackknife by leaving out each chromosome
+`-jk` for calculation of confidence intervals using jackknife by leaving out each chromosome.
 
-`-ms` for running on simulations
+`-ms` for running on simulations.
 ### bracket parameters
 `-e` sets the distance between centres of brackets for FFT (default is 0.01).
 
 `-r` sets the radius of brackets for FFT (default is half of `e`).
 ### files
-`vcf` specifies .vcf file that contains data for all populations
+`vcf` specifies .vcf file that contains data for all populations.
 
-`pf` .txt file that contains samples with indicated population
+`pf` .txt file that contains samples with indicated population.
 
-`-m` .txt file with chromosome name(1-22), var id, var position(bp), var position(cm)
+`-m` .txt file with chromosome name(1-22), var id, var position(bp), var position(cm).
 
-`-p0` name of the admixed population in population .txt file
+`-p0` name of the admixed population in population .txt file.
 
-`-p1` name of the first source population in population .txt file
+`-p1` name of the first source population in population .txt file.
 
-`-p2` name of the second source in popultion .txt file
+`-p2` name of the second source in popultion .txt file.
 
 ### proportions
 `-m1`, `-m2`, `-mt` used for setting adm. proportions for times estimation. You can specify m1 and m2 or the total ancestry proportion mt.
