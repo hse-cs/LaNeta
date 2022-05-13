@@ -70,15 +70,14 @@ If you specify only one source population, admixed population is separated into 
 
 `-jk` for calculation of confidence intervals using jackknife by leaving out each chromosome.
 
-`-ms` for running on simulations.
 ### bracket parameters
-`-e` sets the distance between centres of brackets for FFT (default is 0.01).
+`-b` sets the distance between centres of brackets for FFT (default is 0.01).
 
 `-r` sets the radius of brackets for FFT (default is half of `e`).
 ### files
-`vcf` specifies .vcf file that contains data for all populations.
+`-vcf` specifies .vcf file that contains data for all populations.
 
-`pf` .txt file that contains samples with indicated population.
+`-p` .txt file that contains samples with indicated population.
 
 `-m` .txt file with chromosome name(1-22), var id, var position(bp), var position(cm).
 
@@ -88,12 +87,11 @@ If you specify only one source population, admixed population is separated into 
 
 `-p2` name of the second source in popultion .txt file.
 
-### proportions
-`-m1`, `-m2`, `-mt` used for setting adm. proportions for times estimation. You can specify m1 and m2 or the total ancestry proportion mt.
+### two pulse parameters
+`-m1`, `-m2`, `-mt` used for setting adm. proportions for times estimation. If you know the total ancestry proportion mt you can specify it for better estimation of other parameters.
+`-t1`, `-t2` used for setting adm. times.
 ### cm parameters
 `-min` and `-max` specifies min and max genetic distance for estimations (in cantimorgans).
-### other
-`-seed` specifies random seed.
 
 
 

@@ -21,7 +21,7 @@ parser.add_argument('--binradius', '-r', nargs=1, type=float, default=0.0,
 #files
 parser.add_argument('--vcffile', '-vcf', nargs=1, default=None,
                     help='.vcf file that contains the admixed population')
-parser.add_argument('--popfile', '-pf', nargs=1, default=None,
+parser.add_argument('--popfile', '-p', nargs=1, default=None,
                     help='.txt file that contains samples with indicated population')
 parser.add_argument("--mapfile", '-m',
                     help=".txt file with chromosome name(1-22), var id, var position(bp), var position(cm)")
