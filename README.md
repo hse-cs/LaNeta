@@ -11,8 +11,8 @@ code (gcc and clang are known to work).
 First, install the dependencies
 
 ```
-$ python -m pip install numpy>=1.19.5 cython
-$ python -m pip install msprime
+$ python3 -m pip install numpy>=1.19.5 cython
+$ python3 -m pip install msprime
 ```
 
 To compile .pyx you should use
@@ -38,7 +38,7 @@ We use .vcf files for admixed and two source populations and .txt file with morg
 To specify .vcf  and .txt use these parameters:
 `-vcf vcf/dir.vcf.gz`
 `-m morgans.txt`
-`-pf pop.txt`
+`-p pop.txt`
 
 Also you need to specify which populations from `pop.txt` are admixed and source:
 `-p0 ADM`
@@ -57,7 +57,7 @@ populations .txt format:
 
 Example for real data:
 ```
-python3 laneta.py -e 0.01 -vcf data_yri_clm/mer.vcf.gz -pf data_yri_clm/pop.txt -m data_yri_clm/map.txt -p0 CLM -p1 YRI -mt 0.95
+python3 laneta.py -e 0.01 -vcf data_yri_clm/mer.vcf.gz -p data_yri_clm/pop.txt -m data_yri_clm/map.txt -p0 CLM -p1 YRI -mt 0.95
 ```
 If you specify only one source population, admixed population is separated into two equal-sized groups. These groups are used as the admixed and the missing source population.
 
