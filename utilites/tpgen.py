@@ -1,3 +1,20 @@
+#
+# You can use this python3 script for
+# generating two pulse model data
+# in apropriate format.
+#
+# Dependencies:
+#   msprime
+#   vcftools
+#   tabix
+#   bgzip
+#
+# sintaxis:
+# python3 tpgen.py $sample $chr_n
+# sample - integer, sample, used as uniq random seed and output directory
+# chr_n - integer, number of chromosomes in sample.
+#
+
 import msprime
 
 import subprocess
