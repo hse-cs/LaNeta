@@ -8,6 +8,7 @@
 #   vcftools
 #   tabix
 #   bgzip
+#   merger.sh
 #
 # sintaxis:
 # python3 tpgen.py $sample $chr_n
