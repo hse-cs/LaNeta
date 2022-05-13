@@ -1,5 +1,5 @@
 # LaNeta
-Statistical method for estimating the timing of multiple admixture events based on three locus Linkage Disequilibrium and Local Ancestry.
+Statistical method for estimating parameters (e. g. the timing) of two pulse model based on three locus Linkage Disequilibrium and Local Ancestry.
 
 
 # Installation
