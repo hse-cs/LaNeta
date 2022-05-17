@@ -65,7 +65,7 @@ If you specify only one source population, admixed population is separated into 
 ### bracket parameters
 `-b` sets the distance between centres of brackets for FFT (default is 0.01).
 
-`-r` sets the radius of brackets for FFT (default is half of `b`).
+`-r` sets the radius of brackets for FFT (default is the half of `b`).
 ### files
 `-vcf` specifies .vcf file that contains data for all populations.
 
