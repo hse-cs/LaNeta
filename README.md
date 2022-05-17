@@ -22,15 +22,7 @@ $ python3 setup.py build_ext -i
 ```
 
 # Settings
-## Simulations
 
-
-You can use the method with simulated data for two pulse model. We use msprime for simulations.
-To simulate genetic data you should use `-ms` flag and `simulator_setup.txt`. Use `-seed` parameter to set random seed.
-Example for simulations:
-```
-python3 laneta.py -ms -e 0.01 -mt 0.16
-```
 
 ## Real data
 We use .vcf files for admixed and two source populations and .txt file with morgan units:

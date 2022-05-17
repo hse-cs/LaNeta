@@ -23,7 +23,6 @@ import sys
 import os
 
 # parameters:
-n = 2
 t2 = 10
 t1 = 5
 m1 = 0.2
