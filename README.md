@@ -86,6 +86,7 @@ If you specify only one source population, admixed population is separated into 
 
 ### two pulse parameters
 `-m1`, `-m2`, `-mt` used for setting adm. proportions for times estimation. `-mt` generally used for estimating allele frequencies for missing source population, however by default it is also used for estimating parameters, to avoid this use `-nmt` flag.
+
 `-t1`, `-t2` used for setting adm. times.
 ### cm parameters
 `-min` and `-max` specifies min and max genetic distance for estimations (in cantimorgans).
