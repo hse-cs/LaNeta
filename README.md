@@ -39,20 +39,20 @@ Also you need to specify which populations from `.pop` are admixed and source:
 
 ---
 
-morgans .map format:
+.map format (make sure that there are no duplicates in this file!):
 ```
   CHR_NAME VAR_ID POS_PB POS_MORGANS
 ```
-Make sure that there are no duplicates in this file!
 
-populations .txt format:
+
+.txt format:
 ```
   SAMPLE_ID POPULATION
 ```
 
 ---
 
-Example for real data:
+Example:
 ```
 python3 laneta.py -b 0.01 -vcf mer.vcf.gz -p populations.pop -m morgans.map -p0 CLM -p1 YRI -mt 0.94 -jk -nmt
 ```
