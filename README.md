@@ -85,7 +85,9 @@ If you specify only one source population, admixed population is separated into 
 `-p2` name of the second source in popultion .txt file.
 
 ### two pulse parameters
-`-m1`, `-m2`, `-mt` used for setting adm. proportions for times estimation. `-mt` generally used for estimating allele frequencies for missing source population, however by default it is also used for estimating parameters, to avoid this use `-nmt` flag.
+`-m1` - total admixture proportion of the second source population. Generally used for estimating allele frequencies for missing source population, however by default it is also used for estimating parameters, to avoid this use `-nmt` flag.
+
+`-m2`, `-mt` used for setting adm. proportions. of the second source population.
 
 `-t1`, `-t2` used for setting adm. times.
 ### cm parameters
@@ -94,8 +96,8 @@ If you specify only one source population, admixed population is separated into 
 ## Output
 Output is a tab delimited list of parameters:
 t1 - time between two admixture events, t2 - time to the most recent admixture event,
-m1 - admixture proportion of the first admixture event,
-m2 - admixture proportion of the most recent admixture event.
+m1 - admixture proportion of the second source population for the first admixture event,
+m2 - admixture proportion of the second source population for the most recent admixture event.
 
 
 If jackknife used, output have additional lines:
