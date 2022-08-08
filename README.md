@@ -87,6 +87,8 @@ If you specify only one source population, admixed population is separated into 
 ### two pulse parameters
 `-m1` - total admixture proportion of the second source population. Generally used for estimating allele frequencies for missing source population, however by default it is also used for estimating parameters, to avoid this use `-nmt` flag.
 
+You can set parameters fixed by providing a values with next keys:
+
 `-m2`, `-mt` used for setting adm. proportions. of the second source population.
 
 `-t1`, `-t2` used for setting adm. times.
