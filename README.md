@@ -60,12 +60,6 @@ If you specify only one source population, admixed population is separated into 
 
 
 ## All settings
-### flags
-`-ht` if you use haplotype data instead of genotype.
-
-`-jk` for calculation of confidence intervals using jackknife by leaving out each chromosome.
-
-`-nmt` if you want `mt` to be used only for estimating frequencies from missing source population and not for estimating parameters.
 
 ### bracket parameters
 `-b` sets the distance between centres of brackets for FFT (default is 0.01).
@@ -94,6 +88,13 @@ You can set parameters fixed by providing a values with next keys:
 `-t1`, `-t2` used for setting adm. times.
 ### cm parameters
 `-min` and `-max` specifies min and max genetic distance for estimations (in cantimorgans).
+
+### flags
+`-ht` if you use haplotype data instead of genotype.
+
+`-jk` for calculation of confidence intervals using jackknife by leaving out each chromosome.
+
+`-nmt` if you want `mt` to be used only for estimating frequencies from missing source population and not for estimating parameters.
 
 ## Output
 Output is a tab delimited list of parameters:
