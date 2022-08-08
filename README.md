@@ -45,7 +45,7 @@ Also you need to specify which populations from `.pop` are admixed and source:
 ```
 
 
-.txt format:
+.pop format:
 ```
   SAMPLE_ID POPULATION
 ```
