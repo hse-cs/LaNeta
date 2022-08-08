@@ -36,18 +36,19 @@ Also you need to specify which populations from `.pop` are admixed and source:
 `-p1 SRC1` - admixed 1 time
 
 `-p2 SRC2` - admixed 2 times
-
+---
 morgans .map format:
 ```
   CHR_NAME VAR_ID POS_PB POS_MORGANS
 ```
 Make sure that there are no duplicates in this file!
 
-
 populations .txt format:
 ```
   SAMPLE_ID POPULATION
 ```
+
+---
 
 Example for real data:
 ```
