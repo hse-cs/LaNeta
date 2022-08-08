@@ -93,9 +93,9 @@ If you specify only one source population, admixed population is separated into 
 
 ## Output
 Output is a tab delimited list of parameters:
-T1 - time between two admixture events, T2 - time to the most recent admixture event,
-M1 - admixture proportion of the first admixture event,
-M2 - admixture proportion of the most recent admixture event.
+t1 - time between two admixture events, t2 - time to the most recent admixture event,
+m1 - admixture proportion of the first admixture event,
+m2 - admixture proportion of the most recent admixture event.
 
 
 If jackknife used, output have additional lines:

@@ -846,7 +846,7 @@ class LaNeta:
             return self.parameters
     def print_parameters(self, jk=False):
         if self.parameters != None:
-            print('T1\tT2\tM1\tM2')
+            print('t1\tt2\tm1\tm2')
             print(f'{self.parameters[0]}\t{self.parameters[1]}\t{self.parameters[2]}\t{self.parameters[3]}\t estimation')
             if jk and self.jk_done:
                 print(f'{self.jk_bias[0]}\t{self.jk_bias[1]}\t{self.jk_bias[2]}\t{self.jk_bias[3]}\tjk bias')
@@ -941,7 +941,7 @@ class LaNeta:
         x0s = rng.uniform(_rand_bounds, rand_bounds_, size=(10, len(rand_bounds_)))
         r = None
         cost = np.inf
-        variables_names = ['T1', 'T2', 'M1', 'M2', 'Mt']
+        variables_names = ['t1', 't2', 'm1', 'm2', 'mt']
         if fixed != [] and not silent:
             print('fixed variables:' , end=' ')
             for i in fixed:
