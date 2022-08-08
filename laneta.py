@@ -15,8 +15,8 @@ parser = argparse.ArgumentParser(description='...')
 #brackets
 parser.add_argument('--binsize', '-b', nargs=1, type=float, default=0.001,
                     help='distance between brackets (default is 0.001)')
-parser.add_argument('--binradius', '-r', nargs=1, type=float, default=0.0,
-                    help='radius for bracket')
+parser.add_argument('--binradius', '-r', nargs=1, type=float, default=0,
+                    help='radius for bracket, default is binsize/2')
 
 #files
 parser.add_argument('--vcffile', '-vcf', nargs=1, default=None,
@@ -32,24 +32,29 @@ parser.add_argument('--pop1', '-p1', nargs=1, default=None,
 parser.add_argument('--pop2', '-p2', nargs=1, default=None,
                     help='name of the second source in popfile')
 
+parser.add_argument('--chromosomes', '-c', default=[], nargs='+',
+                    help='name of chromosomes to proceed (default: all contigs from .vcf header are used)')
+
 #flags
-parser.add_argument("--genotype", '-gt',
-                    help="Use if you use genotype data instead of haplotype",
-                    action="store_true")
-parser.add_argument("--affine_term", '-af',
-                    help="Estimate affine term that due to population substructure",
+parser.add_argument("--haplotype", '-ht',
+                    help="Use if you use haplotype data instead of genotype",
                     action="store_true")
 parser.add_argument('--jk', '-jk',
                     help="Estimate confidence intervals with jackknife",
                     action="store_true")
+parser.add_argument('--nmt', '-nmt',
+                    help="To use mt only for allele frequencies.",
+                    action="store_true")
 
 #borders
-parser.add_argument('--max', '-max', nargs=1, type=int, default=20,
+parser.add_argument('--max', '-max', nargs=1, type=float, default=30,
                     help='max d and ds for estimation in cantimograns')
-parser.add_argument('--min', '-min', nargs=1, type=int, default=1,
+parser.add_argument('--min', '-min', nargs=1, type=float, default=0.5,
                     help='min d and ds for estimation in cantimograns')
 
 #parameters
+parser.add_argument('--mt', '-mt', nargs=1, type=float, default=None,
+                    help='total adm. prop. for the second source pop.')
 parser.add_argument('--m1', '-m1', nargs=1, type=float, default=None,
                     help='adm. prop of the first event for the second source pop.')
 parser.add_argument('--m2', '-m2', nargs=1, type=float, default=None,
@@ -58,8 +63,6 @@ parser.add_argument('--t1', '-t1', nargs=1, type=float, default=None,
                     help='adm. time of the first event.')
 parser.add_argument('--t2', '-t2', nargs=1, type=float, default=None,
                     help='adm. time of the first event.')
-parser.add_argument('--mt', '-mt', nargs=1, type=float, default=None,
-                    help='total adm. prop. for the second source pop.')
 
 
 clargs = parser.parse_args()
@@ -105,19 +108,35 @@ if isinstance(clargs.max, list):
 if isinstance(clargs.min, list):
     clargs.min = clargs.min[0]
 
+#flags
+if isinstance(clargs.jk, list):
+    clargs.jk = clargs.jk[0]
+if isinstance(clargs.nmt, list):
+    clargs.nmt = clargs.nmt[0]
+if isinstance(clargs.haplotype, list):
+    clargs.haplotype = clargs.haplotype[0]
+
 print('Starting LaNeta...')
-exp = LaNeta(popfile=clargs.popfile, vcffile=clargs.vcffile,
-             pop0=clargs.pop0, pop1=clargs.pop1, pop2=clargs.pop2,
-             mapfile=clargs.mapfile, gt=clargs.genotype)
 
-parameters = exp.estimateTwoPulse(cm_max=20, freq_filter=0,
-                                  bin_size=0.001, bin_radius=0.0005,
-                                  cm_min=0.5,
-                                  M1=clargs.m1, M2=clargs.m2,
-                                  T1=clargs.t1, T2=clargs.t2,
-                                  Mt=clargs.mt)
+# защита
+if clargs.binsize < 0 or clargs.binradius < 0:
+    print('Wrong bin format!')
+elif clargs.pop0 == None or (clargs.pop1 == None and clargs.pop2 == None):
+    print('Admixed population and at least one source population are requared!')
+elif (clargs.pop1 == None or clargs.pop2 == None) and clargs.mt == None:
+    print('If only one source population is avalable total admixture proportion (-mt) is requared!')
+elif clargs.mapfile == None or clargs.popfile == None or clargs.vcffile == None:
+    print('Please provide all requared input files! (-vcf, -m, -p)')
+else:
+    exp = LaNeta(popfile=clargs.popfile, vcffile=clargs.vcffile,
+                 pop0=clargs.pop0, pop1=clargs.pop1, pop2=clargs.pop2,
+                 mapfile=clargs.mapfile, gt=not clargs.haplotype, contig_names=clargs.chromosomes)
 
-
-print('[T1, T2, M1, M2] =', parameters)
-if clargs.jk:
-    print('T1: ({}, {})\nT2: ({}, {})'.format(est[2][0], est[2][1], est[3][0], est[3][1]))
+    parameters = exp.estimateTwoPulse(cm_max=clargs.max,
+                                      bin_size=clargs.binsize, bin_radius=clargs.binradius,
+                                      cm_min=clargs.min, jk=clargs.jk,
+                                      M1=clargs.m1, M2=clargs.m2,
+                                      T1=clargs.t1, T2=clargs.t2,
+                                      Mt=clargs.mt, nmt=clargs.nmt)
+    print()
+    exp.print_parameters(jk=clargs.jk)

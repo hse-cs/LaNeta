@@ -7,8 +7,7 @@ from Cython.Distutils import build_ext
 import numpy
 
 
-if sys.platform == "darwin":
-    extra_compile_args = [""]#["-stdlib=libc", "-std=c"]
+extra_compile_args = [""]#["-stdlib=libc", "-std=c"]
 
 
 ext = Extension("LaNeta.fastc", ["LaNeta/fastc.pyx"],

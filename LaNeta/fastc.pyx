@@ -27,9 +27,7 @@ from libc.stdlib cimport strtod
 #     ssize_t getline(char **, size_t *, FILE *)
 
 
-def read_positions(filename, long c_x, str chr_name): #c_x - max count to read, chr_i - chromosome to read
-
-    cdef double[::1] pos = np.empty((c_x), dtype=np.double)
+def read_positions(filename, str chr_name): #c_x - max count to read, chr_i - chromosome to read
 
     filename_byte_string = filename.encode("UTF-8")
     cdef char* fname = filename_byte_string
@@ -45,17 +43,36 @@ def read_positions(filename, long c_x, str chr_name): #c_x - max count to read, 
     cdef ssize_t read
     cdef char *  ph = NULL
     cdef int ws = ord(' ')
-    cdef int c = 0
+
+    cdef int length = 0;
 
     while True:
         read = getline(&line, &l, cfile)
-        if read == -1 or c == c_x: break
+        if read == -1: break
+        ph = strtok(line, ' ')
+        if ph == chr_name.encode('UTF-8'):
+            length += 1
+    fclose(cfile)
+
+    cfile = fopen(fname, "rb")
+    line = NULL
+    l = 0
+    ph = NULL
+
+    cdef int c = 0
+    cdef double[::1] pos = np.empty((length), dtype=np.double)
+    cdef long [::1] pos_bp = np.empty((length), dtype=np.int_)
+
+    while True:
+        read = getline(&line, &l, cfile)
+        if read == -1: break
         #ph = strtol(line, NULL, 10)
         ph = strtok(line, ' ')
         #if ph > chr_i: break
         if ph == chr_name.encode('UTF-8'):
             pch = strtok(NULL, ' ')
             pch = strtok(NULL, ' ')
+            pos_bp[c] = strtol(pch, NULL, 10)
             pch = strtok(NULL, ' ')
             #if pos[c-1] > strtod(pch, NULL) / 100 : break
             #print(pch)
@@ -65,7 +82,7 @@ def read_positions(filename, long c_x, str chr_name): #c_x - max count to read, 
 
     fclose(cfile)
 
-    return pos[:c], c
+    return pos_bp, pos, length
 
 
 @cython.wraparound(False)
@@ -84,11 +101,10 @@ def read_vcf_pos(vcf_gen, long c_x): #c_x - max count to read, chr_i - chromosom
 @cython.cdivision(True)
 @cython.wraparound(False)
 @cython.boundscheck(False)
-def read_vcf_genotype(vcf_gen, long c_x, long[:] H_samples, long[:] F_samples, long[:] G_samples, long[:] inds = None):
+def read_vcf_genotype(vcf_gen, long[::1] pos_bp, long c_x, long[:] H_samples, long[:] F_samples, long[:] G_samples):
 
     cdef int i = 0
     cdef short[:,::1] y
-    cdef long c = 0
     cdef int n0 = len(H_samples) , n1 = len(F_samples), n2 = len(G_samples)
     cdef char[:, ::1] H = np.empty((c_x, n0), dtype=np.byte) #but it's not H generally
     cdef char[:, ::1] F = np.empty((c_x, n1), dtype=np.byte) #but it's not F generally
@@ -100,7 +116,7 @@ def read_vcf_genotype(vcf_gen, long c_x, long[:] H_samples, long[:] F_samples, l
 
     for var in vcf_gen:
         if j == c_x: break
-        if inds == None or c == inds[j]:
+        if var.POS == pos_bp[j]:
             y = var.genotype.array()[:,:2].copy(order='C')
             for i in range(n0):
                 id = H_samples[i]
@@ -124,8 +140,7 @@ def read_vcf_genotype(vcf_gen, long c_x, long[:] H_samples, long[:] F_samples, l
                     y[id][1] = 1
                 G[j][i] = y[id][0]+y[id][1]
             j += 1
-        c = c + 1
-        #if c == c_x: break
+    print(j)
     return H, F, G
 
 
@@ -165,7 +180,7 @@ cdef missing_freq(double h, double f, double m):
     cdef double freq = (h - f*m)/(1-m)
     if freq<0:
         freq = 0
-    if freq>1:
+    if freq>2:
         freq = 1
     return freq
 
@@ -424,15 +439,32 @@ def estimate_affine_term(double[:,:,::1] H_chroms, double[:,:,::1] F_chroms, dou
     print(at)
     return at / (chr_n * (chr_n - 1.0) * (chr_n - 2.0) / 6)
 
+@cython.cdivision(True)
+@cython.wraparound(False)
+@cython.boundscheck(False)
+def estimate_frequencies_c(char[:,::1] H, int n0,
+                           char[:,::1] F, int n1,
+                           char[:,::1] G, int n2,
+                           int c_x):
+
+    cdef double[::1] H_freq = np.empty((c_x), dtype=np.double)
+    cdef double[::1] F_freq = np.empty((c_x), dtype=np.double)
+    cdef double[::1] G_freq = np.empty((c_x), dtype=np.double)
+
+    for x in range(0, c_x):
+        H_freq[x] = estimate_freq(H[x], n0)
+        F_freq[x] = estimate_freq(F[x], n1)
+        G_freq[x] = estimate_freq(G[x], n2)
+    return H_freq, F_freq, G_freq
 
 @cython.cdivision(True)
 @cython.wraparound(False)
 @cython.boundscheck(False)
-def est_deltas(char[:,::1] H, int n0,
-               char[:,::1] F, int n1,
-               char[:,::1] G, int n2,
-               double freq_filter, int c_x,
-               double m=0, missing_ref=0):          # (Chromosome obj, bool for deltas)
+def estimate_deltas_c(double[:] H_freq,
+                      double[:] F_freq,
+                      double[:] G_freq,
+                      double freq_filter, int c_x,
+                      double m=0, missing_ref=0): # (Chromosome obj, bool for deltas)
 
     cdef int x = 0
     cdef double delta_x = 0
@@ -440,25 +472,32 @@ def est_deltas(char[:,::1] H, int n0,
 
     cdef int norm_c = 0
     cdef double ph_x = 0
-    cdef double f_x = 0, h_x = 0, g_x = 0
+
+    cdef double f_x = 0, g_x = 0
+
+    cdef double[::1] Delta_freq = np.empty((c_x), dtype=np.double)
+
 
     for x in range(0, c_x):
-        f_x = estimate_freq(F[x], n1)
-        h_x = estimate_freq(H[x], n0)
-        g_x = estimate_freq(G[x], n2)
         if missing_ref==1:
             #f_x = (h_x*n0 + f_x*n1) / (n0+n1)
-            f_x=missing_freq(f_x, g_x, m)
-        if missing_ref==2:
+            f_x=missing_freq(F_freq[x], G_freq[x], m)
+            g_x = G_freq[x]
+        elif missing_ref==2:
             #g_x = (h_x*n0 + g_x*n2) / (n0+n2)
-            g_x=missing_freq(g_x, f_x, 1-m)
+            g_x=missing_freq(G_freq[x], F_freq[x], 1-m)
+            f_x = F_freq[x]
+        else:
+            f_x = F_freq[x]
+            g_x = G_freq[x]
 
-        if g_x+f_x >= freq_filter:
-            delta_x += (f_x - g_x)**2
-            norm_c += 1
+        #if H_freq[x]+F_freq[x]+G_freq[x] >= freq_filter:
+        Delta_freq[x] = (f_x - g_x)
+        delta_x += Delta_freq[x]**2
+        norm_c += 1
     delta_x /= norm_c
     #print(delta_x)
-    return delta_x
+    return delta_x, Delta_freq
 
 
 @cython.cdivision(True)
@@ -621,21 +660,22 @@ def binning_b_double(double[:,::1] H, int n0,
                 b[s_i, d_current] *= float(c[d_current])
     #endTime = datetime.now()
     #print('b bin done for', endTime - startTime)
-    print('bad missing freq:',prob)
+    #print('bad missing freq:',prob)
     return b
 
 
 @cython.cdivision(True)
 @cython.wraparound(False)
 @cython.boundscheck(False)
-def binning_b_int(char[:,::1] H, int n0,
-                  char[:,::1] F, int n1,
-                  char[:,::1] G, int n2,
-                  double freq_filter, long[:] c,
+def binning_bins_int(char[:,::1] H, int n0,
+                  double[:] Delta_freq,
+                  double[:] H_freq,
+                  double[:] F_freq,
+                  double[:] G_freq,
+                  double freq_filter,
                   double[:] pos, int c_x,
-                  double d_unit, double r,
-                  double m=0,
-                  char missing_ref=0):          # (Chromosome obj, bool for deltas)
+                  double d_unit, double r):
+    # (Chromosome obj, bool for deltas)
     # Part 1 - Binning data
     #startTime = datetime.now()
     cdef:
@@ -644,12 +684,12 @@ def binning_b_int(char[:,::1] H, int n0,
         int d_current = 0 # d_current - position in term of d_unit: {0, 1, ... , d_current, ... , P - 1}
         int bins_n = int(ceil(pos[c_x - 1]/d_unit))
 
-        double h_x, f_x, g_x, delta_x
         int x, s_i
 
         double[:,::1] b = np.zeros((n0, bins_n), dtype=np.double)
+        double[:] c = np.zeros((bins_n), dtype=np.double)
 
-        double[:,::1] C_new = np.zeros((n0, bins_n), dtype=np.double)
+        double[:,::1] rescale = np.zeros((n0, bins_n), dtype=np.double)
 
     cdef double[:] C = np.arange(bins_n, dtype=np.double) * d_unit + (d_unit/2)
 
@@ -657,19 +697,9 @@ def binning_b_int(char[:,::1] H, int n0,
     cdef int rc = 0
     cdef int lc = 0
 
-    for x in range(0, c_x):
+    cdef double f_x = 0, g_x = 0
 
-        h_x = estimate_freq(H[x], n0)
-        f_x = estimate_freq(F[x], n1)
-        g_x = estimate_freq(G[x], n2)
-        #print(h_x, f_x, g_x)
-        if missing_ref==1:
-            f_x=missing_freq(f_x, g_x, m)
-        if missing_ref==2:
-            g_x=missing_freq(g_x, f_x, 1-m)
-            if g_x == 1 or g_x == 0:
-                prob+=1
-        delta_x = (f_x - g_x)
+    for x in range(0, c_x):
 
         while pos[x] >= (d_unit)*(cc+1):
             cc += 1
@@ -677,35 +707,36 @@ def binning_b_int(char[:,::1] H, int n0,
         rc = 1
         lc = -1
 
+        c[cc] += 1
+
         for s_i in range(0, n0):
-            if H[x, s_i] >= 0 and f_x+g_x >= freq_filter: #
-                b[s_i, cc] += delta_x * (H[x, s_i] - h_x)      # computing b_i[d_current] for every i
-                C_new[s_i, cc] += 1
+            if H[x, s_i] >= 0: #and F_freq[x]+G_freq[x]+H_freq[x] >= freq_filter: #
+                b[s_i, cc] += Delta_freq[x] * (H[x, s_i] - H_freq[x])      # computing b_i[d_current] for every i
+                rescale[s_i, cc] += 1
 
         while cc+rc < bins_n and -(pos[x] - C[cc+rc]) <= r:
             for s_i in range(0, n0):
-                if H[x, s_i] >= 0 and f_x+g_x >= freq_filter:
-                    b[s_i, cc+rc] += delta_x * (H[x, s_i] - h_x)      # computing b_i[d_current] for every i
-                    C_new[s_i, cc+rc] += 1
+                if H[x, s_i] >= 0: #and F_freq[x]+G_freq[x]+H_freq[x] >= freq_filter:
+                    b[s_i, cc+rc] += Delta_freq[x] * (H[x, s_i] - H_freq[x])      # computing b_i[d_current] for every i
+                    rescale[s_i, cc] += 1
             rc += 1
 
         while cc+lc >= 0 and pos[x] - C[cc+lc] <= r:
             for s_i in range(0, n0):
-                if H[x, s_i] >= 0 and f_x+g_x >= freq_filter:
-                    b[s_i, cc+lc] += delta_x * (H[x, s_i] - h_x)      # computing b_i[d_current] for every i
-                    C_new[s_i, cc+lc] += 1
+                if H[x, s_i] >= 0: #and F_freq[x]+G_freq[x]+H_freq[x] >= freq_filter:
+                    b[s_i, cc+lc] += Delta_freq[x] * (H[x, s_i] - H_freq[x])      # computing b_i[d_current] for every i
+                    rescale[s_i, cc] += 1
             lc -= 1
-
 
     for s_i in range(0, n0):
         for d_current in range(0, bins_n):
-            if C_new[s_i, d_current]!=0:
-                b[s_i, d_current] /= C_new[s_i, d_current]
+            if rescale[s_i, d_current] != c[d_current]:
+                b[s_i, d_current] /= rescale[s_i, d_current]
                 b[s_i, d_current] *= float(c[d_current])
     #endTime = datetime.now()
     #print('b bin done for', endTime - startTime)
-    print('bad missing freq:',prob)
-    return b
+    #print('bad missing freq:',prob)
+    return np.array(b), np.array(c)
 
 #
 # @cython.cdivision(True)

@@ -21,46 +21,45 @@ To compile .pyx you should use
 $ python3 setup.py build_ext -i
 ```
 
-# Settings
-
-
-## Real data
+## Quick start
 We use .vcf files for admixed and two source populations and .txt file with morgan units:
 
 To specify .vcf  and .txt use these parameters:
 `-vcf vcf/dir.vcf.gz`
-`-m morgans.txt`
-`-p pop.txt`
+`-m morgans.map`
+`-p populations.pop`
 
-Also you need to specify which populations from `pop.txt` are admixed and source:
-`-p0 ADM`
-`-p1 SRC1`
-`-p2 SRC2`
+Also you need to specify which populations from `.pop` are admixed and source:
+`-p0 ADM` - admixed population
+`-p1 SRC1` - admixed 1 time
+`-p2 SRC2` - admixed 2 times
 
-morgans .txt format:
+morgans .map format:
 ```
-  CHR_NUMBER VAR_ID POS_PB POS_MORGANS
+  CHR_NAME VAR_ID POS_PB POS_MORGANS
 ```
+Make sure that there are no duplicates in this file!
+
 
 populations .txt format:
 ```
-  SAMPLE POPULATION
+  SAMPLE_ID POPULATION
 ```
 
 Example for real data:
 ```
-python3 laneta.py -e 0.01 -vcf data_yri_clm/mer.vcf.gz -p data_yri_clm/pop.txt -m data_yri_clm/map.txt -p0 CLM -p1 YRI -mt 0.95
+python3 laneta.py -b 0.01 -vcf mer.vcf.gz -p populations.pop -m morgans.map -p0 CLM -p1 YRI -mt 0.94 -jk -nmt
 ```
 If you specify only one source population, admixed population is separated into two equal-sized groups. These groups are used as the admixed and the missing source population.
 
 
 ## All settings
 ### flags
-`-gt` if you use genotype data instead of haplotype.
-
-`-af` is needed if you want to estimate and subtract affine term that due to population substructure.
+`-ht` if you use haplotype data instead of genotype.
 
 `-jk` for calculation of confidence intervals using jackknife by leaving out each chromosome.
+
+`-nmt` if you want `mt` to be used only for estimating frequencies from missing source population and not for estimating parameters.
 
 ### bracket parameters
 `-b` sets the distance between centres of brackets for FFT (default is 0.01).
@@ -69,9 +68,9 @@ If you specify only one source population, admixed population is separated into 
 ### files
 `-vcf` specifies .vcf file that contains data for all populations.
 
-`-p` .txt file that contains samples with indicated population.
+`-p` .pop file that contains samples with indicated population.
 
-`-m` .txt file with chromosome name(1-22), var id, var position(bp), var position(cm).
+`-m` .map file with chromosome name(1-22), var id, var position(bp), var position(cm).
 
 `-p0` name of the admixed population in population .txt file.
 
@@ -85,7 +84,20 @@ If you specify only one source population, admixed population is separated into 
 ### cm parameters
 `-min` and `-max` specifies min and max genetic distance for estimations (in cantimorgans).
 
+## Output
+Output is a tab delimited list of parameters:
+T1 - time between two admixture events, T2 - time to the most recent admixture event,
+M1 - admixture proportion of the first admixture event,
+M2 - admixture proportion of the most recent admixture event.
 
+
+If jackknife used, output have additional lines:
+
+jk bias
+
+jk var
+
+jk 95% conf. interval
 
 ## Data preparation for analysis
 
@@ -98,7 +110,6 @@ Files which are required for data preparation are places in utilites folder. You
   ```
     bcftools merge pop1.vcf pop2.vcf -Oz -o merged.vcf.gz
     plink --vcf merged.vcf.gz --chr 1-22 --snps-only --recode vcf --out filtered_merged
-    bcftools view -Oz -o filtered_merged.vcf.gz filtered_merged
+    bcftools view -m2 -M2 -c20 -v snps -Oz -o filtered_merged.vcf.gz filtered_merged
   ```
   filtered_merged.vcf.gz is the file for your further analysis.
-5. Prepare the file which contains 2 columns: sample ID and Family ID. (You should have one file for all populations you have.)
