@@ -12,7 +12,6 @@ First, install the dependencies
 
 ```
 $ python3 -m pip install numpy>=1.19.5 cython
-$ python3 -m pip install msprime
 ```
 
 To compile .pyx you should use
