@@ -30,8 +30,11 @@ To specify all necessary use these parameters:
 `-p populations.pop`
 
 Also you need to specify which populations from `.pop` are admixed and source:
+
 `-p0 ADM` - admixed population
+
 `-p1 SRC1` - admixed 1 time
+
 `-p2 SRC2` - admixed 2 times
 
 morgans .map format:
