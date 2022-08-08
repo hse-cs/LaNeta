@@ -22,9 +22,9 @@ $ python3 setup.py build_ext -i
 ```
 
 ## Quick start
-We use .vcf files for admixed and two source populations and .txt file with morgan units:
+We use .vcf files for admixed and two source populations and simple txt .map and .pop files with morgan units:
 
-To specify .vcf  and .txt use these parameters:
+To specify all necessary use these parameters:
 `-vcf vcf/dir.vcf.gz`
 `-m morgans.map`
 `-p populations.pop`
