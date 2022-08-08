@@ -36,7 +36,9 @@ Also you need to specify which populations from `.pop` are admixed and source:
 `-p1 SRC1` - admixed 1 time
 
 `-p2 SRC2` - admixed 2 times
+
 ---
+
 morgans .map format:
 ```
   CHR_NAME VAR_ID POS_PB POS_MORGANS
