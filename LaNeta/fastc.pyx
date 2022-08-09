@@ -7,24 +7,13 @@ from libc.math cimport abs
 import numpy as np
 from datetime import datetime
 from numpy.fft import fft, ifft2
-from scipy.stats import binom
 from cyvcf2 import VCF
 
 
 from libc.stdio cimport *
-from libc.string cimport strchr
-from libc.string cimport strcmp
 from libc.string cimport strtok
 from libc.stdlib cimport strtol
 from libc.stdlib cimport strtod
-
-# cdef extern from "stdio.h":
-#     #FILE * fopen ( const char * filename, const char * mode )
-#     FILE *fopen(const char *, const char *)
-#     #int fclose ( FILE * stream )
-#     int fclose(FILE *)
-#     #ssize_t getline(char **lineptr, size_t *n, FILE *stream);
-#     ssize_t getline(char **, size_t *, FILE *)
 
 
 def read_positions(filename, str chr_name): #c_x - max count to read, chr_i - chromosome to read

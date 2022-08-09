@@ -222,8 +222,8 @@ def read_real(files, chr_name, c_max = None, pos_read=True, **kwargs):
         # print(f'length: {pos[pos_entry_count-1]-pos[0]} Morgans.')
         print(f'variants count (.vcf): {vcf_entry_count}')
         if pos_entry_count != vcf_entry_count:
-            print(f'Number of lines for CHR {chr_name} in .vcf and .pos is different!')
             print(f'variants count (.pos): {pos_entry_count}')
+            print(f'Number of lines for CHR {chr_name} in .vcf and .pos is different!')
             if pos_entry_count < vcf_entry_count:
                 print('Using only variants from .pos file...')
             else:
@@ -831,7 +831,7 @@ class LaNeta:
                         self.WLD.jackknife(chr_i)
                         parameters_do[chr_i] = self.estimate_parameters(T1=T1, T2=T2, M1=M1, M2=M2,
                                                                         Mt=Mt, silent=True,
-                                                                        cm_scale=bin_size,
+                                                                        cm_scale=bin_size, nmt=nmt,
                                                                         cm_min=cm_min, cm_max=cm_max,
                                                                         rand_mean=parameters)
                     #print(parameters_do)
@@ -859,7 +859,7 @@ class LaNeta:
                             Mt=None, cm_scale=1, silent=False,
                             cm_min=None, cm_max=None, nmt=False,
                             rand_mean=[10, 10, 0.5, 0.5],
-                            rand_width=0.5):
+                            rand_width=1):
 
         if cm_min == None:
             cm_min = self.cm_min
