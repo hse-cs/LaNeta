@@ -4,8 +4,7 @@ Statistical method for estimating parameters (e. g. the timing) of two pulse mod
 
 # Installation
 
-For performance reasons, we use cython to speed up calculations, so you need
-to compile `.pyx` by yourself. For this, you need a working toolchain for building C
+For performance reasons, we use cython to speed up calculations. For this, you need a working toolchain for building C
 code (gcc and clang are known to work). Since you are going to build Python extensions, you will need python development headers (e.g. on ubuntu linux the package name is python-dev).
 
 The simplest quick-start cross-platform way is to use `conda`. To do this, create a fresh conda environment:
