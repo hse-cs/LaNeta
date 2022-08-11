@@ -19,5 +19,5 @@ py3.extension_module(
   include_directories: [inc_np, npymath_path, npyrandom_path],
   dependencies : [py3_dep, npymath_lib, npyrandom_lib],
   install: true,
-  subdir : 'LaNeta'
+  install_dir: cur_dir
 )
