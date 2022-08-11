@@ -10,8 +10,8 @@ code (gcc and clang are known to work). Since you are going to build Python exte
 The simplest quick-start cross-platform way is to use `conda`. To do this, create a fresh conda environment:
 
 ```
-$ conda create -n conda_vgsim
-$ conda activate conda_vgsim
+$ conda create -n conda_laneta
+$ conda activate conda_laneta
 $ conda install python=3.9       # or other python version of your choice (any `python >= 3.7` should work).
 ```
 
@@ -21,13 +21,13 @@ Get the source code --- here we clone it from GitHub
 
 ```
 $ git clone https://github.com/Genomics-HSE/VGsim.git
-$ cd VGsim
+$ cd LaNeta
 ```
 
 Then build the package:
 
 ```
-$ python -m pip install .
+$ python3 -m pip install .
 ```
 
 That's it!
