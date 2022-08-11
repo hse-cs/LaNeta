@@ -13,17 +13,11 @@ npyrandom_path = incdir_numpy / '..' / '..' / 'random' / 'lib'
 npyrandom_lib = meson.get_compiler('c').find_library('npyrandom', dirs: npyrandom_path)
 
 
-# locate currnet dir
-cur_dir = run_command(py3,
-  ['-c', 'import os; print(os.getcwd());'],
-  check : true
-).stdout().strip()
-
 # generate .so for rndm
 py3.extension_module(
   'fastc', fastc,
   include_directories: [inc_np, npymath_path, npyrandom_path],
   dependencies : [py3_dep, npymath_lib, npyrandom_lib],
   install: true,
-  install_dir: cur_dir
+  subdir : 'LaNeta'
 )
