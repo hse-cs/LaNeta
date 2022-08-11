@@ -5,16 +5,10 @@ project(
   'LaNeta',
   ['c', 'cython'],
   default_options : ['buildtype=debugoptimized'],
-  version: '3',
+  version: '3.0',
   license: 'GPL-3.0 License',
   meson_version: '>= 0.54',
 )
-
-# Special check for MacOS, cause of cpp version
-# if build_machine.system() == 'darwin'
-#     add_global_arguments('-std=c++17', language : 'cpp')
-#     message('found OS X, add special argument to compiler')
-# endif
 
 # Seek the backend
 if meson.backend() != 'ninja'
