@@ -6,19 +6,32 @@ Statistical method for estimating parameters (e. g. the timing) of two pulse mod
 
 For performance reasons, we use cython to speed up calculations, so you need
 to compile `.pyx` by yourself. For this, you need a working toolchain for building C
-code (gcc and clang are known to work).
+code (gcc and clang are known to work). Since you are going to build Python extensions, you will need python development headers (e.g. on ubuntu linux the package name is python-dev).
 
-First, install the dependencies
-
-```
-$ python3 -m pip install numpy>=1.19.5 cython
-```
-
-To compile .pyx you should use
+The simplest quick-start cross-platform way is to use `conda`. To do this, create a fresh conda environment:
 
 ```
-$ python3 setup.py build_ext -i
+$ conda create -n conda_vgsim
+$ conda activate conda_vgsim
+$ conda install python=3.9       # or other python version of your choice (any `python >= 3.7` should work).
 ```
+
+Note that we install python *with conda, inside the conda environment*. Mixing system-install python and conda may lead to build- or runtime errors.
+
+Get the source code --- here we clone it from GitHub
+
+```
+$ git clone https://github.com/Genomics-HSE/VGsim.git
+$ cd VGsim
+```
+
+Then build the package:
+
+```
+$ python -m pip install .
+```
+
+That's it!
 
 ## Quick start
 We use .vcf files for admixed and two source populations and simple txt .map and .pop files with morgan units:
