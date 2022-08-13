@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import sys
-import time
-from random import randrange
-from random import randint
-import numpy as np
 
 from LaNeta.ThLd import LaNeta
 
@@ -122,7 +117,7 @@ print('Starting LaNeta...')
 if clargs.binsize < 0 or clargs.binradius < 0:
     print('Wrong bin format!')
 elif clargs.pop0 == None or (clargs.pop1 == None and clargs.pop2 == None):
-    print('Admixed population and at least one source population are requared!')
+    print('Admixed population and at least one source population are required!')
 elif (clargs.pop1 == None or clargs.pop2 == None) and clargs.mt == None:
     print('If only one source population is avalable total admixture proportion (-mt) is requared!')
 elif clargs.mapfile == None or clargs.popfile == None or clargs.vcffile == None:
