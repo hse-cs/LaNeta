@@ -27,7 +27,7 @@ $ cd LaNeta
 Then build the package:
 
 ```
-$ python3 -m pip install .
+$ python -m pip install .
 ```
 
 That's it!
@@ -65,7 +65,7 @@ Also you need to specify which populations from `.pop` are admixed and source:
 
 Example:
 ```
-python3 laneta.py -b 0.01 -vcf mer.vcf.gz -p populations.pop -m morgans.map -p0 CLM -p1 YRI -mt 0.94 -jk -nmt
+python laneta.py -b 0.01 -vcf mer.vcf.gz -p populations.pop -m morgans.map -p0 CLM -p1 YRI -mt 0.94 -jk -nmt
 ```
 If you specify only one source population, admixed population is separated into two equal-sized groups. These groups are used as the admixed and the missing source population.
 
