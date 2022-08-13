@@ -7,7 +7,6 @@ from scipy.optimize import minimize
 from scipy.optimize import least_squares
 
 from cyvcf2 import VCF
-import LaNeta.gen
 
 
 def get_vcf_seqlen(vcffile, name):

@@ -6,7 +6,8 @@ requires  = [
     "ninja",
     "numpy>=1.19.5",
     "Cython>=0.29.18",
-    "cyvcf2"
+    "cyvcf2",
+    "scipy"
 ]
 
 build-backend = "mesonpep517.buildapi"
