@@ -1,12 +1,13 @@
-from LaNeta.fastc import binning_b, binning_c, FFT, thld_6, binning_deltas, estimate_frequencies_c, estimate_deltas_c, \
+from LaNeta.fastc import FFT, thld_6, binning_deltas, estimate_frequencies_c, estimate_deltas_c, \
 noFFT, binning_bins_int, estimate_affine_term, estimate_coef_slow, estimate_affine_term_v2
-from LaNeta.fastc import read_vcf_pos, read_vcf_genotype, read_positions
+from LaNeta.fastc import read_vcf_genotype, read_positions
 import numpy as np
 from datetime import datetime
 from scipy.optimize import minimize
 from scipy.optimize import least_squares
 
 from cyvcf2 import VCF
+import LaNeta.gen
 
 
 def get_vcf_seqlen(vcffile, name):
