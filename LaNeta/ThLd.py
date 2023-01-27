@@ -7,7 +7,6 @@ from scipy.optimize import minimize
 from scipy.optimize import least_squares
 
 from cyvcf2 import VCF
-import LaNeta.gen
 
 
 def get_vcf_seqlen(vcffile, name):
@@ -48,43 +47,58 @@ def mkarr(ls):
         Arr[i, :ls[i].shape[0], :ls[i].shape[0]] = ls[i]
     return Arr
 
-def read_msprime(ts_list, chr_i, c_max = None, pos_read=True, gt=False):
-    data = Chromosome()
-    ts = ts_list[chr_i]
-    data.n0 = len(ts.samples(0))# * 10
-    data.n1 = len(ts.samples(1))
-    data.n2 = len(ts.samples(2))
+def get_individuals_nodes(ts, population_id, sampled=False):
+    nodes = [] # nodes of samples
+    for node in ts.nodes(): # they are contained in return of ts.nodes()
+        if node.population == population_id and node.individual != -1:
+            nodes.append(node.id)
+    return nodes
 
+
+def read_msprime(data_input, chr_i, c_max = None, pos_read=True, gt=False):
+    data = Chromosome()
+
+    ts_list = data_input[0]
+    pop0, pop1, pop2 = data_input[1], data_input[2], data_input[3]
+
+    ts = ts_list[chr_i]
+    data.n0 = len(ts.samples(pop0))# * 10
+    data.n1 = len(ts.samples(pop1))
+    data.n2 = len(ts.samples(pop2))
+
+    adm_samples_id = get_individuals_nodes(ts, pop0)
+    src1_samples_id = get_individuals_nodes(ts, pop1)
+    src2_samples_id = get_individuals_nodes(ts, pop2)
 
     pos = np.empty(ts.sites().length, dtype=np.double)
-    H = np.empty((ts.sites().length, data.n0), dtype=np.double)     # Admixed
-    F = np.empty((ts.sites().length, data.n1), dtype=np.double)     # 1st anc
-    G = np.empty((ts.sites().length, data.n2), dtype=np.double)    # 2nd anc
+    H = np.empty((ts.sites().length, data.n0), dtype=np.byte)     # Admixed
+    F = np.empty((ts.sites().length, data.n1), dtype=np.byte)     # 1st anc
+    G = np.empty((ts.sites().length, data.n2), dtype=np.byte)    # 2nd anc
     #print(H.shape, F.shape, G.shape)
     c = ts.sites().length
     if data.n1 == 0:
-        H = np.empty((ts.sites().length, data.n0 - data.n0//2), dtype=np.double)     # 1st anc
-        F = np.empty((ts.sites().length, data.n0//2), dtype=np.double)    # 2nd anc
+        H = np.empty((ts.sites().length, data.n0 - data.n0//2), dtype=np.byte)     # 1st anc
+        F = np.empty((ts.sites().length, data.n0//2), dtype=np.byte)    # 2nd anc
         data.missing_ref = 1
     if data.n2 == 0:
-        H = np.empty((ts.sites().length, data.n0 - data.n0//2), dtype=np.double)     # 1st anc
-        G = np.empty((ts.sites().length, data.n0//2), dtype=np.double)    # 2nd anc
+        H = np.empty((ts.sites().length, data.n0 - data.n0//2), dtype=np.byte)     # 1st anc
+        G = np.empty((ts.sites().length, data.n0//2), dtype=np.byte)    # 2nd anc
         data.missing_ref = 2
     if pos_read:
         pos = ts.tables.sites.position / ts.sequence_length
         gt_matrix = ts.genotype_matrix()
         if data.n1 == 0:
-            F = gt_matrix[:, : data.n0 // 2]
-            H = gt_matrix[:, data.n0 // 2: data.n0]
-            G = gt_matrix[:, data.n0:]
+            F = gt_matrix[:, adm_samples_id[:data.n0//2]]
+            H = gt_matrix[:, adm_samples_id[data.n0//2:]]
+            G = gt_matrix[:, src2_samples_id]
         elif data.n2 == 0:
-            G = gt_matrix[:, : data.n0 // 2]
-            H = gt_matrix[:, data.n0 // 2: data.n0]
-            F = gt_matrix[:, data.n0:]
+            G = gt_matrix[:, adm_samples_id[:data.n0//2]]
+            H = gt_matrix[:, adm_samples_id[data.n0//2:]]
+            F = gt_matrix[:, src1_samples_id]
         else:
-            G = gt_matrix[:, data.n0 + data.n1 : data.n0 + data.n1 + data.n2]
-            F = gt_matrix[:, data.n0 : data.n0 + data.n1]
-            H = gt_matrix[:, : data.n0]
+            G = gt_matrix[:, src2_samples_id]
+            F = gt_matrix[:, src1_samples_id]
+            H = gt_matrix[:, adm_samples_id]
     else:
         c_total = ts.get_num_sites()
         print('max:', c_max, 'total:', c_total)
@@ -135,9 +149,9 @@ def read_msprime(ts_list, chr_i, c_max = None, pos_read=True, gt=False):
         data.n2//=2
     # #
     # print(data.n0, data.n1, data.n2, H.dtype)
-    data.G = np.array(G[:, :data.n2])
-    data.H = np.array(H[:, :data.n0])
-    data.F = np.array(F[:, :data.n1])
+    data.G = np.array(G[:, :data.n2], dtype=np.byte, order='C')
+    data.H = np.array(H[:, :data.n0], dtype=np.byte, order='C')
+    data.F = np.array(F[:, :data.n1], dtype=np.byte, order='C')
     data.pos = pos[:c]
     data.sequence_length = c
     #print('pa',H.shape)
@@ -236,7 +250,7 @@ def read_real(files, chr_name, c_max = None, pos_read=True, **kwargs):
         print('max:', c_max, 'total:', c_total)
         rng = np.random.default_rng()
         inds = np.sort(rng.choice(c_total, size=c_max, replace=False))
-        H, F, G = read_vcf(vcf(chr_name), c_max, H_samples, F_samples, G_samples, inds=inds)
+        H, F, G = read_vcf_genotype(vcf(chr_name), c_max, H_samples, F_samples, G_samples, inds=inds)
         c = c_max
     vcf.close()
 
@@ -440,6 +454,10 @@ class Weighted_LD:
 
         self.calculated = False
 
+        self.ld_filename = 'ld.txt'
+        if vcffile != None:
+            self.ld_filename = vcffile.split('.')[0] + '.ld'
+
         self.coef = None
         self.delta = None
         self.ld = None
@@ -490,7 +508,7 @@ class Weighted_LD:
             if len(data_ms[0].samples(1)) == 0 or len(data_ms[0].samples(2)) == 0:
                 self.one_ref = True
             self.read = read_msprime
-            self.data_input = data_ms
+            self.data_input = [data_ms, pop0, pop1, pop2]
 
 
 
@@ -591,6 +609,7 @@ class Weighted_LD:
                 self.coef -= self.at
 
             self.ld = self.coef/self.delta**3
+            np.savetxt(self.ld_filename, self.ld)
             self.calculated = True
         else:
             print('No WLD calculated!')
@@ -816,7 +835,8 @@ class LaNeta:
             parameters = self.estimate_parameters(T1=T1, T2=T2, M1=M1, M2=M2,
                                                   Mt=Mt, nmt=nmt,
                                                   cm_scale=bin_size,
-                                                  cm_min=cm_min, cm_max=cm_max)
+                                                  cm_min=cm_min, cm_max=cm_max,
+                                                  save=True)
             self.parameters = parameters
             if jk:
                 if self.WLD.chr_n < 2:
@@ -859,7 +879,7 @@ class LaNeta:
                             Mt=None, cm_scale=1, silent=False,
                             cm_min=None, cm_max=None, nmt=False,
                             rand_mean=[10, 10, 0.5, 0.5],
-                            rand_width=1):
+                            rand_width=1, save=False):
 
         if cm_min == None:
             cm_min = self.cm_min
@@ -984,4 +1004,12 @@ class LaNeta:
             res_M[1] = M2
         print('estimated:',r.x)
         print('cost function value:', cost)
+
+        if save:
+            th_E = thld_6(np.array(res_T, dtype=np.double),
+                          np.array(res_M, dtype=np.double),
+                          0, cm_scale, P_)
+            np.savetxt(self.WLD.ld_filename+'.fld', th_E[_P:P_, _P:P_])
+            np.savetxt(self.WLD.ld_filename+'.tld', self.WLD.ld[_P:P_, _P:P_])
+
         return res_T[0], res_T[1], res_M[0], res_M[1]

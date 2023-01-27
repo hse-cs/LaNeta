@@ -30,3 +30,9 @@ conv*
 build/
 data*/
 saved_data/
+*.ld
+*.fld
+*.tld
+*.pop
+*.pos
+*.csi
