@@ -224,7 +224,7 @@ def read_real(files, chr_name, c_max = None, pos_read=True, **kwargs):
         print(f'CHR: {chr_name}', end=' ')
         pos_bp, pos, pos_entry_count = read_pos(mapfile, chr_name) #chr_i+1 because .txt contains names of chomosomes
         if pos_entry_count == 0:
-            print('- Empty!')
+            print('- Empty .map!')
             data.isEmpty = True
             return data
         vcf_entry_count = get_vcf_seqlen(vcffile ,chr_name)

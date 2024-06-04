@@ -38,7 +38,7 @@ def read_positions(filename, str chr_name): #c_x - max count to read, chr_i - ch
     while True:
         read = getline(&line, &l, cfile)
         if read == -1: break
-        ph = strtok(line, ' ')
+        ph = strtok(line, ' \t')
         if ph == chr_name.encode('UTF-8'):
             length += 1
     fclose(cfile)
@@ -56,13 +56,13 @@ def read_positions(filename, str chr_name): #c_x - max count to read, chr_i - ch
         read = getline(&line, &l, cfile)
         if read == -1: break
         #ph = strtol(line, NULL, 10)
-        ph = strtok(line, ' ')
+        ph = strtok(line, ' \t')
         #if ph > chr_i: break
         if ph == chr_name.encode('UTF-8'):
-            pch = strtok(NULL, ' ')
-            pch = strtok(NULL, ' ')
+            pch = strtok(NULL, ' \t')
+            pch = strtok(NULL, ' \t')
             pos_bp[c] = strtol(pch, NULL, 10)
-            pch = strtok(NULL, ' ')
+            pch = strtok(NULL, ' \t')
             #if pos[c-1] > strtod(pch, NULL) / 100 : break
             #print(pch)
             pos[c] = strtod(pch, NULL) / 100
