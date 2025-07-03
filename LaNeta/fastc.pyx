@@ -129,7 +129,9 @@ def read_vcf_genotype(vcf_gen, long[::1] pos_bp, long c_x, long[:] H_samples, lo
                     y[id][1] = 1
                 G[j][i] = y[id][0]+y[id][1]
             j += 1
-    print(j)
+        else:
+            print(f'A position in the .vcf ({var.POS}) is different from the one in .pos ({pos_bp[j]}). Skeeping this variant in the .vcf...')
+    print(f'{j} variants read.')
     return H, F, G
 
 

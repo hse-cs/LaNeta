@@ -188,7 +188,7 @@ def read_pop(vcffile, popfile, populations):
             if sample in samples:
                 G_samples.append(samples.index(sample))
 
-    return np.array(H_samples, dtype=np.int), np.array(F_samples, dtype=np.int), np.array(G_samples, dtype=np.int)
+    return np.array(H_samples, dtype=int), np.array(F_samples, dtype=int), np.array(G_samples, dtype=int)
 
 def read_real(files, chr_name, c_max = None, pos_read=True, **kwargs):
     #open vcf

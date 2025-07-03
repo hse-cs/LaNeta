@@ -34,5 +34,6 @@ saved_data/
 *.fld
 *.tld
 *.pop
+*.lpop
 *.pos
 *.csi
