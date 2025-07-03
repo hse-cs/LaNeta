@@ -5,7 +5,7 @@ project(
   'LaNeta',
   ['c', 'cython'],
   default_options : ['buildtype=debugoptimized'],
-  version: '3.0',
+  version: '3.1',
   license: 'GPL-3.0 License',
   meson_version: '>= 0.54',
 )
