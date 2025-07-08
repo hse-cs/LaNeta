@@ -37,7 +37,7 @@ We use .vcf files for admixed and two source populations and simple txt .map and
 
 To specify all necessary use these parameters:
 `-vcf vcf/dir.vcf.gz`
-`-m morgans.map`
+`-m centimorgans.map`
 `-p populations.pop`
 
 Also you need to specify which populations from `.pop` are admixed and source:
@@ -50,9 +50,9 @@ Also you need to specify which populations from `.pop` are admixed and source:
 
 ---
 
-.map format (make sure that there are no duplicates in this file!):
+.map format (make sure that there are no duplicates in this file and it does not contain variants that are not presented in `.vcf`):
 ```
-  CHR_NAME VAR_ID POS_PB POS_MORGANS
+  CHR_NAME VAR_ID POS_BP POS_CENTIMORGANS
 ```
 
 
@@ -61,11 +61,13 @@ Also you need to specify which populations from `.pop` are admixed and source:
   SAMPLE_ID POPULATION
 ```
 
+
+Don't include the header in all files except `.vcf`.
 ---
 
 Example:
 ```
-python laneta.py -b 0.01 -vcf mer.vcf.gz -p populations.pop -m morgans.map -p0 CLM -p1 YRI -mt 0.94 -jk -nmt
+python laneta.py -b 0.01 -vcf mer.vcf.gz -p populations.pop -m centimorgans.map -p0 CLM -p1 YRI -mt 0.94 -jk -nmt
 ```
 If you specify only one source population, admixed population is separated into two equal-sized groups. These groups are used as the admixed and the missing source population.
 
