@@ -63,6 +63,7 @@ Also you need to specify which populations from `.pop` are admixed and source:
 
 
 Don't include the header in all files except `.vcf`.
+
 ---
 
 Example:
